@@ -1,0 +1,97 @@
+body, html, #root {
+  height: 100%;
+  margin: 0;
+  font-family: 'Arial', sans-serif;
+  background-color: #343541;
+  color: #d1d5db;
+}
+
+.App {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  background-color: #343541;
+}
+
+.ant-layout {
+  background: #343541;
+}
+
+.ant-layout-header {
+  background: #202123;
+  color: #d1d5db;
+  text-align: center;
+  font-size: 1.5rem;
+}
+
+.ant-layout-content {
+  padding: 0 50px;
+  overflow-y: auto;
+  background-color: #343541;
+}
+
+.ant-layout-footer {
+  background: #202123;
+  padding: 10px;
+}
+
+.ant-card {
+  border-radius: 10px;
+  border: none;
+  color: #d1d5db;
+}
+
+.ant-card-body {
+  background-color: #40414F;
+}
+
+.ant-input {
+  border-radius: 5px;
+  background-color: #40414F;
+  color: #d1d5db;
+  border: none;
+}
+
+.ant-input:focus, .ant-input-focused {
+  box-shadow: none;
+}
+
+.ant-btn-primary {
+  border-radius: 5px;
+  background-color: #10a37f;
+  border: none;
+}
+
+.ant-btn-primary:hover {
+  background-color: #0e8e6f;
+}
+
+.ant-menu-dark.ant-menu-inline, .ant-menu-dark .ant-menu-sub {
+  background: #202123;
+}
+
+.ant-menu-dark .ant-menu-item-selected {
+  background-color: #343541 !important;
+}
+
+.ant-menu-dark .ant-menu-item:hover {
+  background-color: #343541 !important;
+}
+
+.ant-layout-sider {
+  background: #202123;
+}
+
+.ant-layout-sider-trigger {
+  background: #202123;
+  color: #d1d5db;
+}
+
+.ant-menu-dark .ant-menu-item {
+  color: #d1d5db;
+}
+
+.ant-menu-dark .ant-menu-item:hover, .ant-menu-dark .ant-menu-item-active, .ant-menu-dark .ant-menu-item-open, .ant-menu-dark .ant-menu-submenu-title:hover {
+  color: #10a37f;
+}
