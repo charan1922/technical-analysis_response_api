@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from 'react';
-
-// Existing imports
 import { Avatar, Divider, Flex, Layout, Menu, Typography } from 'antd';
 import { MessageOutlined, SettingOutlined, PlusOutlined, UserOutlined, OpenAIOutlined } from '@ant-design/icons';
 import ChatMessage from './ChatMessage';
 import InputArea from './InputArea';
 import axios from 'axios';
+import Sidebar from './Sidebar';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -15,15 +14,15 @@ const ChatInterface: React.FC = () => {
   const [collapsed, setCollapsed] = useState(false);
   const [threadId, setThreadId] = useState<string | null>(null); // Added state for threadId
 
-  useEffect(() => {
-    axios.get('http://localhost:9000/thread')
-      .then(response => {
-        setThreadId(response.data.threadId); // Assuming the API returns an object with an 'id' field
-      })
-      .catch(error => {
-        console.error('There was an error fetching the thread data:', error);
-      });
-  }, []); // Empty dependency array means this effect runs once after the initial render
+  // useEffect(() => {
+  //   axios.get('http://localhost:9000/thread')
+  //     .then(response => {
+  //       setThreadId(response.data.threadId); // Assuming the API returns an object with an 'id' field
+  //     })
+  //     .catch(error => {
+  //       console.error('There was an error fetching the thread data:', error);
+  //     });
+  // }, []); 
 
   const handleSendMessage = async (message: string) => {
     try {
@@ -39,20 +38,7 @@ const ChatInterface: React.FC = () => {
 
   return (
     <Layout style={{ height: '100vh' }}>
-      <Sider collapsible collapsed={collapsed} onCollapse={setCollapsed}>
-        <div className="logo" />
-        <Menu theme="dark" mode="inline">
-          <Menu.Item key="1" icon={<PlusOutlined />}>
-            New Chat
-          </Menu.Item>
-          <Menu.Item key="2" icon={<MessageOutlined />}>
-            Recent Chats
-          </Menu.Item>
-          <Menu.Item key="3" icon={<SettingOutlined />}>
-            Settings
-          </Menu.Item>
-        </Menu>
-      </Sider>
+      <Sidebar collapsed={collapsed} onCollapse={setCollapsed} />
       <Layout style={{ backgroundColor: "#FFF" }}>
         <Header>AI</Header>
         <Content style={{

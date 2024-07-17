@@ -1,6 +1,6 @@
 import React from 'react';
 import { Col, Row } from 'antd';
-import Markdown from './shared/CustomMarkdown';
+import Markdown from '../shared/CustomMarkdown';
 
 interface ChatMessageProps {
   message: string;
