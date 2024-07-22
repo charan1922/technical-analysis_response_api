@@ -9,27 +9,17 @@ const { Sider } = Layout;
 interface ISidebar {
     collapsed: boolean;
     onCollapse: React.Dispatch<React.SetStateAction<boolean>>;
+    threadIds: any;
+    initiateNewChat: any
 }
 
-const Sidebar = ({ collapsed, onCollapse }: ISidebar) => {
-    const [threadIds, setThreadIds] = useState([]);
+const Sidebar = ({ collapsed, onCollapse, threadIds, initiateNewChat }: ISidebar) => {
     const location = useLocation();
-
-    useEffect(() => {
-        axios.get('http://localhost:9000/threads')
-            .then(response => {
-                setThreadIds(response.data);
-            })
-            .catch(error => {
-                console.error('There was an error fetching the thread data:', error);
-            });
-    }, []);
-
     return (
         <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
             <Menu theme="dark" mode="inline" selectedKeys={[location.pathname]}>
-                <Menu.Item key="new-chat" icon={<PlusOutlined />}>
-                    <Link to="/">New Chat</Link>
+                <Menu.Item key="new-chat" icon={<PlusOutlined />} onClick={initiateNewChat}>
+                    New Chat
                 </Menu.Item>
 
                 {(threadIds || []).map(({ threadId }: { threadId: string }) => (
