@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Avatar, Divider, Flex, Layout, Menu, Typography } from 'antd';
+import { Avatar, Divider, Flex, Layout, Menu, Spin, Typography } from 'antd';
 import { MessageOutlined, SettingOutlined, PlusOutlined, UserOutlined, OpenAIOutlined } from '@ant-design/icons';
 import ChatMessage from './ChatMessage';
 import InputArea from './InputArea';
@@ -16,6 +16,7 @@ const ChatInterface: React.FC = () => {
   const [threadId, setThreadId] = useState<string | null>(null); // Added state for threadId
   const [threadIds, setThreadIds] = useState([]);
   const [newChatInitiated, setNewChatInitiated] = useState(false);
+  const [loader, setLoader] = useState(false);
 
   const { threadId: threadIdFromParams } = useParams();
   const navigate = useNavigate();
@@ -37,7 +38,7 @@ const ChatInterface: React.FC = () => {
   }, [newChatInitiated]);
 
   function getThreadsList(navigateFirstChat = false) {
-    axios.get('http://localhost:9000/threads')
+    axios.get('http://localhost:9000/thread/allThreads')
       .then(response => {
         setThreadIds(response.data);
         setNewChatInitiated(false);
@@ -74,12 +75,15 @@ const ChatInterface: React.FC = () => {
   }, [threadIdFromParams]);
 
   const handleSendMessage = async (message: string) => {
+    setLoader(true);
     try {
       const res = await axios.post('http://localhost:9000/message', { message, threadId: threadIdFromParams });
       setMessages(res.data.messages);
     } catch (error) {
       console.error('Error communicating with server:', error);
       setResponse('Something went wrong');
+    } finally {
+      setLoader(false);
     }
   };
 
@@ -130,6 +134,9 @@ const ChatInterface: React.FC = () => {
           })}
         </Content>
         <Footer style={{ backgroundColor: "#FFF" }}>
+          <Flex justify='center' align='center' style={{ marginBottom: 5 }}>
+            {loader && <Spin tip="Loading..." />}
+          </Flex>
           <InputArea onSendMessage={handleSendMessage} />
         </Footer>
       </Layout>
