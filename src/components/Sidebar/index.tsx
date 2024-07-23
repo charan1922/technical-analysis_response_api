@@ -16,7 +16,7 @@ interface ISidebar {
 const Sidebar = ({ collapsed, onCollapse, threadIds, initiateNewChat }: ISidebar) => {
     const location = useLocation();
     return (
-        <Sider collapsible collapsed={collapsed} onCollapse={onCollapse}>
+        <Sider width={250} collapsible collapsed={collapsed} onCollapse={onCollapse}>
             <Menu theme="dark" mode="inline" selectedKeys={[location.pathname]}>
                 <Menu.Item key="new-chat" icon={<PlusOutlined />} onClick={initiateNewChat}>
                     New Chat
