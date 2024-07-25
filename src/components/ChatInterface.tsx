@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Avatar, Divider, Flex, Layout, Menu, Spin, Typography } from 'antd';
+import { Avatar, Divider, Flex, Layout, Menu, Space, Spin, Typography } from 'antd';
 import { MessageOutlined, SettingOutlined, PlusOutlined, UserOutlined, OpenAIOutlined } from '@ant-design/icons';
 import ChatMessage from './ChatMessage';
 import InputArea from './InputArea';
@@ -10,45 +10,43 @@ import { useParams, useNavigate } from 'react-router-dom';
 const { Header, Content, Footer, Sider } = Layout;
 
 const ChatInterface: React.FC = () => {
-  const [messages, setMessages] = useState<{ text: string, sender: string }[]>([]);
+  const [messages, setMessages] = useState<any>([]);
   const [response, setResponse] = useState('');
   const [collapsed, setCollapsed] = useState(false);
   const [threadId, setThreadId] = useState<string | null>(null); // Added state for threadId
   const [threadIds, setThreadIds] = useState([]);
-  const [newChatInitiated, setNewChatInitiated] = useState(false);
   const [loader, setLoader] = useState(false);
 
   const { threadId: threadIdFromParams } = useParams();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    if (newChatInitiated) {
-      axios.get('http://localhost:9000/thread')
-        .then(response => {
-          const threadId = response.data.threadId
-          setThreadId(threadId);
-          const navigateFirstChat = true;
-          getThreadsList(navigateFirstChat);
-        })
-        .catch(error => {
-          setNewChatInitiated(false);
-          console.error('There was an error fetching the thread data:', error);
-        });
-    }
-  }, [newChatInitiated]);
+
+  const initiateNewChat = (analysisName: string) => {
+    axios.get(`http://localhost:9000/thread/new?name=${analysisName}`)
+      .then(response => {
+        const threadId = response.data.threadId
+        setThreadId(threadId);
+        const navigateFirstChat = true;
+        getThreadsList(navigateFirstChat);
+      })
+      .catch(error => {
+
+        console.error('There was an error fetching the thread data:', error);
+      });
+  }
+
 
   function getThreadsList(navigateFirstChat = false) {
     axios.get('http://localhost:9000/thread/allThreads')
       .then(response => {
         setThreadIds(response.data);
-        setNewChatInitiated(false);
+
         if (navigateFirstChat) {
           const threadId = response.data?.[0]?.threadId
           navigate(`/c/${threadId}`);
         }
       })
       .catch(error => {
-        setNewChatInitiated(false);
         console.error('There was an error fetching the thread data:', error);
       });
   }
@@ -59,7 +57,6 @@ const ChatInterface: React.FC = () => {
         setMessages(response.data.messages);
       })
       .catch(error => {
-        setNewChatInitiated(false);
         console.error('There was an error fetching the thread data:', error);
       });
   }
@@ -75,6 +72,16 @@ const ChatInterface: React.FC = () => {
   }, [threadIdFromParams]);
 
   const handleSendMessage = async (message: string) => {
+
+    const msg: any = {
+      messageText: message,
+      msgId: "",
+      runId: null,
+      thread_id: threadIdFromParams
+    }
+
+    setMessages([...messages, msg]);
+
     setLoader(true);
     try {
       const res = await axios.post('http://localhost:9000/message', { message, threadId: threadIdFromParams });
@@ -88,9 +95,7 @@ const ChatInterface: React.FC = () => {
   };
 
 
-  const initiateNewChat = () => {
-    setNewChatInitiated(true);
-  }
+
 
 
 
@@ -116,7 +121,7 @@ const ChatInterface: React.FC = () => {
             height: "calc(100% - 24px)",
             overflowX: "auto"
           }}>
-          {messages.map((msg: any, index) => {
+          {messages.map((msg: any, index: React.Key | null | undefined) => {
             return (
               <>
                 <Flex justify="flex-start" gap="large">
