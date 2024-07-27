@@ -1,11 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Avatar, Divider, Flex, Layout, Menu, Space, Spin, Typography } from 'antd';
-import { MessageOutlined, SettingOutlined, PlusOutlined, UserOutlined, OpenAIOutlined } from '@ant-design/icons';
-import ChatMessage from './ChatMessage';
+import { Flex, Layout, Spin } from 'antd';
+import { AssistantStream } from "openai/lib/AssistantStream";
 import InputArea from './InputArea';
 import axios from 'axios';
 import Sidebar from './Sidebar';
 import { useParams, useNavigate } from 'react-router-dom';
+import Messages from './Messages';
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -16,10 +16,10 @@ const ChatInterface: React.FC = () => {
   const [threadId, setThreadId] = useState<string | null>(null); // Added state for threadId
   const [threadIds, setThreadIds] = useState([]);
   const [loader, setLoader] = useState(false);
+  const [inputDisabled, setInputDisabled] = useState(false);
 
   const { threadId: threadIdFromParams } = useParams();
   const navigate = useNavigate();
-
 
   const initiateNewChat = (analysisName: string) => {
     axios.get(`http://localhost:9000/thread/new?name=${analysisName}`)
@@ -61,6 +61,217 @@ const ChatInterface: React.FC = () => {
       });
   }
 
+
+  /*
+    =======================
+    === Utility Helpers ===
+    =======================
+  */
+
+  const appendMessage1 = (parsedData: any) => {
+    setMessages((prevMessages: any) => [...prevMessages, parsedData]);
+  };
+
+  const appendToLastMessage1 = (parsedData: any) => {
+    debugger
+    setMessages((prevMessages: string | any[]) => {
+      const lastMessage = prevMessages[prevMessages.length - 1];
+      const updatedLastMessage = {
+        ...lastMessage,
+        messageText: lastMessage.messageText + parsedData.messageText,
+      };
+      return [...prevMessages.slice(0, -1), updatedLastMessage];
+    });
+  }
+
+
+  const appendToLastMessage = (text: string) => {
+    setMessages((prevMessages: string | any[]) => {
+      const lastMessage = prevMessages[prevMessages.length - 1];
+      const updatedLastMessage = {
+        ...lastMessage,
+        text: lastMessage.text + text,
+      };
+      return [...prevMessages.slice(0, -1), updatedLastMessage];
+    });
+  };
+
+  const appendMessage = (role: string, text: string) => {
+    setMessages((prevMessages: any) => [...prevMessages, { role, text }]);
+  };
+
+  const annotateLastMessage = (annotations: any[]) => {
+    setMessages((prevMessages: string | any[]) => {
+      const lastMessage = prevMessages[prevMessages.length - 1];
+      const updatedLastMessage = {
+        ...lastMessage,
+      };
+      annotations.forEach((annotation: { type: string; text: any; file_path: { file_id: any; }; }) => {
+        if (annotation.type === 'file_path') {
+          updatedLastMessage.text = updatedLastMessage.text.replaceAll(
+            annotation.text,
+            `/api/files/${annotation.file_path.file_id}`
+          );
+        }
+      })
+      return [...prevMessages.slice(0, -1), updatedLastMessage];
+    });
+
+  }
+
+
+
+  /*
+  =======================
+  === Stream Handling Start ===
+  =======================
+*/
+
+  const handleRunCompleted = () => {
+    setInputDisabled(false);
+  };
+  /* Stream Event Handlers */
+  // textCreated - create new assistant message
+  const handleTextCreated = () => {
+    appendMessage("assistant", "");
+  };
+
+  // textDelta - append text to last assistant message
+  const handleTextDelta = (delta: any) => {
+    if (delta.value != null) {
+      appendToLastMessage(delta.value);
+    };
+    if (delta.annotations != null) {
+      annotateLastMessage(delta.annotations);
+    }
+  };
+
+  // imageFileDone - show image in chat
+  const handleImageFileDone = (image: { file_id: any; }) => {
+    appendToLastMessage(`\n![${image.file_id}](/api/files/${image.file_id})\n`);
+  }
+
+  // toolCallCreated - log new tool call
+  const toolCallCreated = (toolCall: any) => {
+    if (toolCall.type != "code_interpreter") return;
+    appendMessage("code", "");
+  };
+
+  // toolCallDelta - log delta and snapshot for the tool call
+  const toolCallDelta = (delta: any, snapshot: any) => {
+    if (delta.type != "code_interpreter") return;
+    if (!delta.code_interpreter.input) return;
+    appendToLastMessage(delta.code_interpreter.input);
+  };
+
+
+  const handleReadableStream = (stream: AssistantStream) => {
+    // messages
+    stream.on("textCreated", handleTextCreated);
+    stream.on("textDelta", handleTextDelta);
+
+    // image
+    stream.on("imageFileDone", handleImageFileDone);
+
+    // code interpreter
+    stream.on("toolCallCreated", toolCallCreated);
+    stream.on("toolCallDelta", toolCallDelta);
+
+    // events without helpers yet (e.g. requires_action and run.done)
+    stream.on("event", (event) => {
+      if (event.event === "thread.run.completed") handleRunCompleted();
+    });
+  };
+
+  const handleSendMessage = async (message: string) => {
+    const msg: any = {
+      messageText: message,
+      msgId: "",
+      role: "user",
+      runId: null,
+      thread_id: threadIdFromParams
+    }
+    setMessages([...messages, msg]);
+    setLoader(true);
+    try {
+      // const response = await axios.post('http://localhost:9000/message', { message, threadId: threadIdFromParams },
+      //   {
+      //     responseType: 'stream'
+      //   }
+      // );
+
+
+      const fetchStream = async () => {
+        try {
+          const response: any = await fetch('http://localhost:9000/message', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              message, threadId: threadIdFromParams     // Replace with actual thread ID
+            }),
+          });
+
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+
+          const reader = response.body.getReader();
+          const decoder = new TextDecoder('utf-8');
+
+          const readStream = async () => {
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+
+              const decodedValue = decoder.decode(value);
+              const lines = decodedValue.split('\n').filter(Boolean);
+
+              lines.forEach((line, index) => {
+                if (line.startsWith('data: ')) {
+                  const jsonData = line.substring(6);
+                  try {
+                    const parsedData = JSON.parse(jsonData);
+                    if (index === 0) {
+                      appendMessage1(parsedData)
+                    } else {
+                      appendToLastMessage1(parsedData);
+                    }
+                  } catch (error) {
+                    console.error('Error parsing line:', line);
+                  }
+                }
+              });
+            }
+          };
+
+          readStream().catch(console.error);
+        } catch (error) {
+          console.error('Error fetching stream:', error);
+        }
+      };
+
+      fetchStream();
+
+
+
+    } catch (error) {
+      console.error('Error communicating with server:', error);
+      setResponse('Something went wrong');
+    } finally {
+      setInputDisabled(false);
+      setLoader(false);
+    }
+  };
+
+
+  /*
+  =======================
+  === Stream Handling End ===
+  =======================
+*/
+
   useEffect(() => {
     getThreadsList();
   }, []);
@@ -71,42 +282,12 @@ const ChatInterface: React.FC = () => {
     }
   }, [threadIdFromParams]);
 
-  const handleSendMessage = async (message: string) => {
-
-    const msg: any = {
-      messageText: message,
-      msgId: "",
-      runId: null,
-      thread_id: threadIdFromParams
-    }
-
-    setMessages([...messages, msg]);
-
-    setLoader(true);
-    try {
-      const res = await axios.post('http://localhost:9000/message', { message, threadId: threadIdFromParams });
-      setMessages(res.data.messages);
-    } catch (error) {
-      console.error('Error communicating with server:', error);
-      setResponse('Something went wrong');
-    } finally {
-      setLoader(false);
-    }
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
-
-
-
-
-
-
-  const previousScrollHeightRef = useRef(0);
-
   useEffect(() => {
-    const contentElement = document.getElementById('content');
-    if (contentElement && contentElement.scrollHeight !== previousScrollHeightRef.current) {
-      contentElement.scrollTop = contentElement.scrollHeight;
-      previousScrollHeightRef.current = contentElement.scrollHeight;
-    }
+    scrollToBottom();
   }, [messages]);
 
   return (
@@ -114,35 +295,21 @@ const ChatInterface: React.FC = () => {
       <Sidebar collapsed={collapsed} onCollapse={setCollapsed} threadIds={threadIds} initiateNewChat={initiateNewChat} />
       <Layout style={{ backgroundColor: "#FFF" }}>
         <Header>AI</Header>
-        <Content id="content"
+        <Content
           style={{
-            margin: '24px 16px',
+            margin: '24px 250px',
             padding: 24,
             height: "calc(100% - 24px)",
             overflowX: "auto"
           }}>
-          {messages.map((msg: any, index: React.Key | null | undefined) => {
-            return (
-              <>
-                <Flex justify="flex-start" gap="large">
-                  <Avatar style={{ backgroundColor: msg.runId ? "#1677ff" : '#87d068' }} icon={msg.runId ? <OpenAIOutlined /> : <UserOutlined />} />
-                  <Flex gap="middle" vertical>
-                    <Typography.Title level={5}>
-                      {msg.runId ? "Assistant" : "User"}
-                    </Typography.Title>
-                    <ChatMessage key={index} message={msg.messageText} />
-                  </Flex>
-                </Flex>
-                <Divider />
-              </>
-            )
-          })}
+          <Messages messages={messages} />
+          <div ref={messagesEndRef} />
         </Content>
         <Footer style={{ backgroundColor: "#FFF" }}>
           <Flex justify='center' align='center' style={{ marginBottom: 5 }}>
             {loader && <Spin tip="Loading..." />}
           </Flex>
-          <InputArea onSendMessage={handleSendMessage} />
+          <InputArea onSendMessage={handleSendMessage} setInputDisabled={setInputDisabled} inputDisabled={inputDisabled} scrollToBottom={scrollToBottom} />
         </Footer>
       </Layout>
     </Layout >

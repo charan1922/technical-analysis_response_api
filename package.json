@@ -15,6 +15,7 @@
     "antd": "^5.19.0",
     "axios": "^1.7.2",
     "markdown-to-jsx": "^7.4.7",
+    "openai": "^4.53.2",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-markdown": "^9.0.1",
