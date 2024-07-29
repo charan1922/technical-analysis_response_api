@@ -12,12 +12,14 @@ const UserMessage = ({ text, role }: { text: string; role: string }) => {
   return (
     <>
       <Flex justify="flex-start" gap="large">
-        <Avatar
-          style={{
-            backgroundColor: "#87d068",
-          }}
-          icon={<UserOutlined />}
-        />
+        <div>
+          <Avatar
+            style={{
+              backgroundColor: "#87d068",
+            }}
+            icon={<UserOutlined />}
+          />
+        </div>
         <Flex gap="middle" vertical>
           <Typography.Title level={5}>
             {`${role.charAt(0).toUpperCase()}${role.slice(1)}`}
@@ -33,12 +35,14 @@ const AssistantMessage = ({ role, text }: { text: string; role: string }) => {
   return (
     <>
       <Flex justify="flex-start" gap="large">
-        <Avatar
-          style={{
-            backgroundColor: "#1677ff",
-          }}
-          icon={<OpenAIOutlined />}
-        />
+        <div>
+          <Avatar
+            style={{
+              backgroundColor: "#1677ff",
+            }}
+            icon={<OpenAIOutlined />}
+          />
+        </div>
         <Flex gap="middle" vertical>
           <Typography.Title level={5}>
             {`${role.charAt(0).toUpperCase()}${role.slice(1)}`}

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { Flex, Layout, Spin } from "antd";
+import { Avatar, Flex, Layout, Spin } from "antd";
 import { AssistantStream } from "openai/lib/AssistantStream";
 import InputArea from "./InputArea";
 import axios from "axios";
@@ -7,6 +7,7 @@ import Sidebar from "./Sidebar";
 import { useParams, useNavigate } from "react-router-dom";
 import Messages from "./Messages";
 import loadingGif from "../assets/loading.gif";
+import { UserOutlined } from "@ant-design/icons";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -314,7 +315,22 @@ const ChatInterface: React.FC = () => {
         initiateNewChat={initiateNewChat}
       />
       <Layout style={{ backgroundColor: "#FFF" }}>
-        <Header>AI</Header>
+        <Header style={{ display: "flex", justifyContent: "space-between" }}>
+          <Flex
+            align="center"
+            style={{ color: "#FFF", fontSize: 20, fontWeight: 400 }}
+          >
+            Algorum Mystic
+          </Flex>
+          <Flex align="center">
+            <Avatar
+              style={{
+                color: "#FFF",
+              }}
+              icon={<UserOutlined />}
+            />
+          </Flex>
+        </Header>
         <Content
           style={{
             padding: 24,

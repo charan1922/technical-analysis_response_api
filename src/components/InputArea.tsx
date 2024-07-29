@@ -35,14 +35,12 @@ const InputArea: React.FC<InputAreaProps> = ({
         style={{ flex: 1, marginRight: "10px", height: 45 }}
       />
       <Button
-        style={{ height: 45 }}
+        style={{ height: 45, width: 60 }}
         type="primary"
-        icon={<SendOutlined />}
+        icon={<SendOutlined  />}
         onClick={handleSend}
         disabled={inputDisabled}
-      >
-        Send
-      </Button>
+      />
     </div>
   );
 };
