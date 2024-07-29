@@ -6,6 +6,7 @@ import axios from "axios";
 import Sidebar from "./Sidebar";
 import { useParams, useNavigate } from "react-router-dom";
 import Messages from "./Messages";
+import loadingGif from "../assets/loading.gif";
 
 const { Header, Content, Footer, Sider } = Layout;
 
@@ -75,9 +76,13 @@ const ChatInterface: React.FC = () => {
   const appendToLastMessage1 = (parsedData: any) => {
     setMessages((prevMessages: string | any[]) => {
       const lastMessage = prevMessages[prevMessages.length - 1];
+      const messageText = lastMessage.messageText?.includes("Loading...")
+        ? parsedData.messageText
+        : lastMessage.messageText + parsedData.messageText;
+
       const updatedLastMessage = {
         ...lastMessage,
-        messageText: lastMessage.messageText + parsedData.messageText,
+        messageText,
       };
       return [...prevMessages.slice(0, -1), updatedLastMessage];
     });
@@ -185,14 +190,23 @@ const ChatInterface: React.FC = () => {
   };
 
   const handleSendMessage = async (message: string) => {
-    const msg: any = {
-      messageText: message,
-      msgId: "",
-      role: "user",
-      runId: null,
-      thread_id: threadIdFromParams,
-    };
-    setMessages([...messages, msg]);
+    const msg: any = [
+      {
+        messageText: message,
+        msgId: "",
+        role: "user",
+        runId: null,
+        thread_id: threadIdFromParams,
+      },
+      {
+        messageText: `![Loading...](${loadingGif})`,
+        msgId: "",
+        role: "assistant",
+        runId: null,
+        thread_id: threadIdFromParams,
+      },
+    ];
+    setMessages([...messages, ...msg]);
     setLoader(true);
     try {
       // const response = await axios.post('http://localhost:9000/message', { message, threadId: threadIdFromParams },
@@ -235,7 +249,7 @@ const ChatInterface: React.FC = () => {
                   try {
                     const parsedData = JSON.parse(jsonData);
                     if (parsedData?.role === "assistant") {
-                      appendMessage1(parsedData);
+                      // appendMessage1(parsedData);
                     } else {
                       appendToLastMessage1(parsedData);
                     }
@@ -299,15 +313,22 @@ const ChatInterface: React.FC = () => {
         <Header>AI</Header>
         <Content
           style={{
-            margin: "24px 250px",
+            // margin: "24px 250px",
             padding: 24,
             height: "calc(100% - 24px)",
             overflowX: "auto",
           }}
         >
-          <Messages messages={messages} />
-          <div ref={messagesEndRef} />
+          <div
+            style={{
+              margin: "24px 300px",
+            }}
+          >
+            <Messages messages={messages} />
+            <div ref={messagesEndRef} />
+          </div>
         </Content>
+
         <Footer style={{ backgroundColor: "#FFF" }}>
           <Flex justify="center" align="center" style={{ marginBottom: 5 }}>
             {loader && <Spin tip="Loading..." />}

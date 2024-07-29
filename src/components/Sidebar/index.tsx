@@ -1,11 +1,11 @@
-import { Layout, Menu, MenuProps } from "antd";
+import { Button, Layout, Menu, MenuProps } from "antd";
 import {
   MessageOutlined,
   SettingOutlined,
   PlusOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
 import AnalysisModal from "./AnalysisModal";
 
@@ -31,9 +31,6 @@ const Sidebar = ({
   const [current, setCurrent] = useState(threadId || "");
 
   const onClick: MenuProps["onClick"] = (e) => {
-    if (e.key === "newAnalysis") {
-      setIsModalVisible(true);
-    }
     setCurrent(e.key);
   };
 
@@ -41,12 +38,16 @@ const Sidebar = ({
     initiateNewChat(analysisName);
   };
 
+  useEffect(() => {
+    if (threadId) setCurrent(threadId);
+  }, [threadId]);
+
   const items: MenuItem[] = [
-    {
-      label: "New Analysis",
-      key: "newAnalysis",
-      icon: <PlusOutlined />,
-    },
+    // {
+    //   label: <span onClick={() => setIsModalVisible(true)}>New Analysis</span>,
+    //   key: "newAnalysis",
+    //   icon: <PlusOutlined />,
+    // },
     ...(threadIds || []).map(
       ({
         threadId,
@@ -59,10 +60,6 @@ const Sidebar = ({
         key: threadId,
         icon: <MessageOutlined />,
       })
-
-      // <Menu.Item key={threadId} icon={<MessageOutlined />}>
-      //   <Link to={`/c/${threadId}`}>{analysisName || "New Analysis"}</Link>
-      // </Menu.Item>
     ),
   ];
 
@@ -73,19 +70,29 @@ const Sidebar = ({
       collapsed={collapsed}
       onCollapse={onCollapse}
     >
-      <Menu
-        theme="dark"
-        mode="inline"
-        onClick={onClick}
-        items={items}
-        selectedKeys={[current]}
-      />
+      <>
+        <Button
+          type="text"
+          onClick={() => setIsModalVisible(true)}
+          style={{ margin: 16, color: "#FFF", fontSize: 14 }}
+        >
+          <PlusOutlined />
+          {collapsed ? "" : "New Analysis"}
+        </Button>
+        <Menu
+          theme="dark"
+          mode="inline"
+          onClick={onClick}
+          items={items}
+          selectedKeys={[current]}
+        />
 
-      <AnalysisModal
-        isModalVisible={isModalVisible}
-        setIsModalVisible={setIsModalVisible}
-        onSubmit={handleSubmit}
-      />
+        <AnalysisModal
+          isModalVisible={isModalVisible}
+          setIsModalVisible={setIsModalVisible}
+          onSubmit={handleSubmit}
+        />
+      </>
     </Sider>
   );
 };
