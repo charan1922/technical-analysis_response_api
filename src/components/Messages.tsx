@@ -25,7 +25,6 @@ const UserMessage = ({ text, role }: { text: string; role: string }) => {
           <ChatMessage message={text} />
         </Flex>
       </Flex>
-      <Divider />
     </>
   );
 };
@@ -47,7 +46,6 @@ const AssistantMessage = ({ role, text }: { text: string; role: string }) => {
           <ChatMessage message={text} />
         </Flex>
       </Flex>
-      <Divider />
     </>
   );
 };
@@ -69,7 +67,12 @@ const Messages = ({ messages }: any) => {
   return (
     <>
       {messages.map((msg: any, index: React.Key | null | undefined) => {
-          return <Message key={index} role={msg?.role} text={msg?.messageText} />;
+        return (
+          <>
+            <Message key={index} role={msg?.role} text={msg?.messageText} />{" "}
+            {messages.length - 1 !== index && <Divider />}
+          </>
+        );
       })}
     </>
   );

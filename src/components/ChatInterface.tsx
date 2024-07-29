@@ -294,11 +294,15 @@ const ChatInterface: React.FC = () => {
   }, [threadIdFromParams]);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
+
   useEffect(() => {
-    scrollToBottom();
+    setTimeout(() => {
+      scrollToBottom();
+    }, 1);
   }, [messages]);
 
   return (
@@ -313,15 +317,15 @@ const ChatInterface: React.FC = () => {
         <Header>AI</Header>
         <Content
           style={{
-            // margin: "24px 250px",
             padding: 24,
-            height: "calc(100% - 24px)",
+            height: "calc(100% - 160px)",
             overflowX: "auto",
           }}
         >
           <div
             style={{
-              margin: "24px 300px",
+              margin: "0px 300px",
+              maxWidth: 950,
             }}
           >
             <Messages messages={messages} />
@@ -329,7 +333,13 @@ const ChatInterface: React.FC = () => {
           </div>
         </Content>
 
-        <Footer style={{ backgroundColor: "#FFF" }}>
+        <Footer
+          style={{
+            backgroundColor: "#FFF",
+            padding: "0px 5px",
+            margin: "25px 280px 25px 280px",
+          }}
+        >
           <Flex justify="center" align="center" style={{ marginBottom: 5 }}>
             {loader && <Spin tip="Loading..." />}
           </Flex>
@@ -339,6 +349,13 @@ const ChatInterface: React.FC = () => {
             inputDisabled={inputDisabled}
             scrollToBottom={scrollToBottom}
           />
+          <Flex
+            justify="center"
+            align="center"
+            style={{ marginTop: 5, color: "rgb(121 110 110)" }}
+          >
+            Assistant can make mistakes. Check important info.
+          </Flex>
         </Footer>
       </Layout>
     </Layout>
