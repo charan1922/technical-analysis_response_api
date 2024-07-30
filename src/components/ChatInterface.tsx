@@ -10,7 +10,7 @@ import loadingGif from "../assets/loading.gif";
 import { UserOutlined } from "@ant-design/icons";
 
 const { Header, Content, Footer, Sider } = Layout;
-
+const streaming = true;
 const ChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<any>([]);
   const [response, setResponse] = useState("");
@@ -210,11 +210,13 @@ const ChatInterface: React.FC = () => {
     setMessages([...messages, ...msg]);
     setLoader(true);
     try {
-      // const response = await axios.post('http://localhost:9000/message', { message, threadId: threadIdFromParams },
-      //   {
-      //     responseType: 'stream'
-      //   }
-      // );
+      const fetchWithoutStream = async () => {
+        const response = await axios.post("http://localhost:9000/message", {
+          message,
+          threadId: threadIdFromParams,
+        });
+        setMessages(response.data.messages);
+      };
 
       const fetchStream = async () => {
         try {
@@ -268,7 +270,11 @@ const ChatInterface: React.FC = () => {
         }
       };
 
-      fetchStream();
+      if (streaming) {
+        fetchStream();
+      } else {
+        fetchWithoutStream();
+      }
     } catch (error) {
       console.error("Error communicating with server:", error);
       setResponse("Something went wrong");

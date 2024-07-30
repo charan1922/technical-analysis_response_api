@@ -74,7 +74,9 @@ const Messages = ({ messages }: any) => {
         return (
           <>
             <Message key={index} role={msg?.role} text={msg?.messageText} />{" "}
-            {messages.length - 1 !== index && <Divider />}
+            {messages.length - 1 !== index && msg?.role === "assistant" && (
+              <Divider />
+            )}
           </>
         );
       })}
