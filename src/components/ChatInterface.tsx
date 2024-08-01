@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Avatar, Flex, Layout, Spin } from "antd";
-import { AssistantStream } from "openai/lib/AssistantStream";
 import InputArea from "./InputArea";
 import axios from "axios";
 import Sidebar from "./Sidebar";
@@ -9,7 +8,7 @@ import Messages from "./Messages";
 import loadingGif from "../assets/loading.gif";
 import { UserOutlined } from "@ant-design/icons";
 
-const { Header, Content, Footer, Sider } = Layout;
+const { Header, Content, Footer } = Layout;
 const streaming = true;
 const ChatInterface: React.FC = () => {
   const [messages, setMessages] = useState<any>([]);
@@ -70,9 +69,9 @@ const ChatInterface: React.FC = () => {
     =======================
   */
 
-  const appendMessage1 = (parsedData: any) => {
-    setMessages((prevMessages: any) => [...prevMessages, parsedData]);
-  };
+  // const appendMessage1 = (parsedData: any) => {
+  //   setMessages((prevMessages: any) => [...prevMessages, parsedData]);
+  // };
 
   const appendToLastMessage1 = (parsedData: any) => {
     setMessages((prevMessages: string | any[]) => {
@@ -88,108 +87,6 @@ const ChatInterface: React.FC = () => {
       return [...prevMessages.slice(0, -1), updatedLastMessage];
     });
   };
-
-  const appendToLastMessage = (text: string) => {
-    setMessages((prevMessages: string | any[]) => {
-      const lastMessage = prevMessages[prevMessages.length - 1];
-      const updatedLastMessage = {
-        ...lastMessage,
-        text: lastMessage.text + text,
-      };
-      return [...prevMessages.slice(0, -1), updatedLastMessage];
-    });
-  };
-
-  const appendMessage = (role: string, text: string) => {
-    setMessages((prevMessages: any) => [...prevMessages, { role, text }]);
-  };
-
-  const annotateLastMessage = (annotations: any[]) => {
-    setMessages((prevMessages: string | any[]) => {
-      const lastMessage = prevMessages[prevMessages.length - 1];
-      const updatedLastMessage = {
-        ...lastMessage,
-      };
-      annotations.forEach(
-        (annotation: {
-          type: string;
-          text: any;
-          file_path: { file_id: any };
-        }) => {
-          if (annotation.type === "file_path") {
-            updatedLastMessage.text = updatedLastMessage.text.replaceAll(
-              annotation.text,
-              `/api/files/${annotation.file_path.file_id}`
-            );
-          }
-        }
-      );
-      return [...prevMessages.slice(0, -1), updatedLastMessage];
-    });
-  };
-
-  /*
-  =======================
-  === Stream Handling Start ===
-  =======================
-*/
-
-  const handleRunCompleted = () => {
-    setInputDisabled(false);
-  };
-  /* Stream Event Handlers */
-  // textCreated - create new assistant message
-  const handleTextCreated = () => {
-    appendMessage("assistant", "");
-  };
-
-  // textDelta - append text to last assistant message
-  const handleTextDelta = (delta: any) => {
-    console.log(delta, "s");
-    if (delta.value != null) {
-      appendToLastMessage(delta.value);
-    }
-    if (delta.annotations != null) {
-      annotateLastMessage(delta.annotations);
-    }
-  };
-
-  // imageFileDone - show image in chat
-  const handleImageFileDone = (image: { file_id: any }) => {
-    appendToLastMessage(`\n![${image.file_id}](/api/files/${image.file_id})\n`);
-  };
-
-  // toolCallCreated - log new tool call
-  const toolCallCreated = (toolCall: any) => {
-    if (toolCall.type != "code_interpreter") return;
-    appendMessage("code", "");
-  };
-
-  // toolCallDelta - log delta and snapshot for the tool call
-  const toolCallDelta = (delta: any, snapshot: any) => {
-    if (delta.type != "code_interpreter") return;
-    if (!delta.code_interpreter.input) return;
-    appendToLastMessage(delta.code_interpreter.input);
-  };
-
-  const handleReadableStream = (stream: AssistantStream) => {
-    // messages
-    stream.on("textCreated", handleTextCreated);
-    stream.on("textDelta", handleTextDelta);
-
-    // image
-    stream.on("imageFileDone", handleImageFileDone);
-
-    // code interpreter
-    stream.on("toolCallCreated", toolCallCreated);
-    stream.on("toolCallDelta", toolCallDelta);
-
-    // events without helpers yet (e.g. requires_action and run.done)
-    stream.on("event", (event) => {
-      if (event.event === "thread.run.completed") handleRunCompleted();
-    });
-  };
-
   const handleSendMessage = async (message: string) => {
     const msg: any = [
       {
