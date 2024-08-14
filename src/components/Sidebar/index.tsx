@@ -4,6 +4,7 @@ import {
   SettingOutlined,
   PlusOutlined,
   LogoutOutlined,
+  FileOutlined,
 } from "@ant-design/icons";
 import { useEffect, useState } from "react";
 import { Link, useLocation, useParams } from "react-router-dom";
@@ -64,36 +65,54 @@ const Sidebar = ({
   ];
 
   return (
-    <Sider
-      width={250}
-      collapsible
-      collapsed={collapsed}
-      onCollapse={onCollapse}
-    >
-      <>
-        <Button
-          type="text"
-          onClick={() => setIsModalVisible(true)}
-          style={{ margin: 16, color: "#FFF", fontSize: 14 }}
-        >
-          <PlusOutlined />
-          {collapsed ? "" : "New Analysis"}
-        </Button>
-        <Menu
-          theme="dark"
-          mode="inline"
-          onClick={onClick}
-          items={items}
-          selectedKeys={[current]}
-        />
+    <>
+      <Sider
+        width={250}
+        collapsible
+        collapsed={collapsed}
+        onCollapse={onCollapse}
+      >
+        <>
+          <Button
+            type="text"
+            onClick={() => setIsModalVisible(true)}
+            style={{ margin: 16, color: "#FFF", fontSize: 14 }}
+          >
+            <PlusOutlined />
+            {collapsed ? "" : "New Analysis"}
+          </Button>
+          <Menu
+            theme="dark"
+            mode="inline"
+            onClick={onClick}
+            items={items}
+            selectedKeys={[current]}
+          />
 
-        <AnalysisModal
-          isModalVisible={isModalVisible}
-          setIsModalVisible={setIsModalVisible}
-          onSubmit={handleSubmit}
-        />
-      </>
-    </Sider>
+          <div style={{ marginTop: "auto" }}>
+            <Button
+              type="link"
+              href={`/file-search/${"thread_HpsiXNWknaz9HjEpm49JbYaE"}`}
+              style={{
+                margin: 16,
+                color: "#FFF",
+                fontSize: 14,
+                bottom: 50,
+                position: "absolute",
+              }}
+            >
+              <FileOutlined />
+              File Search
+            </Button>
+          </div>
+        </>
+      </Sider>
+      <AnalysisModal
+        isModalVisible={isModalVisible}
+        setIsModalVisible={setIsModalVisible}
+        onSubmit={handleSubmit}
+      />
+    </>
   );
 };
 

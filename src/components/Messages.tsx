@@ -54,6 +54,24 @@ const AssistantMessage = ({ role, text }: { text: string; role: string }) => {
   );
 };
 
+const CodeMessage = ({ text }: { text: string }) => {
+  return (
+    <div
+      style={{
+        padding: "10px 16px",
+        counterReset: "line",
+      }}
+    >
+      {text.split("\n").map((line, index) => (
+        <div key={index}>
+          <span>{`${index + 1}. `}</span>
+          {line}
+        </div>
+      ))}
+    </div>
+  );
+};
+
 const Message = ({ role, text }: MessageProps) => {
   switch (role) {
     case "user":
