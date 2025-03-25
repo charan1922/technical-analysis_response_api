@@ -11,13 +11,14 @@ const AppLayout: React.FC<any> = ({ children }: any) => {
   const [collapsed, setCollapsed] = useState(false);
   const [threadId, setThreadId] = useState<string | null>(null);
   const [threadIds, setThreadIds] = useState([]);
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
   const { threadId: threadIdFromParams } = useParams();
   const navigate = useNavigate();
 
   const initiateNewChat = (analysisName: string) => {
     axios
-      .get(`http://localhost:9000/thread/new?name=${analysisName}`)
+      .get(`${apiBaseUrl}/thread/new?name=${analysisName}`)
       .then((response) => {
         const threadId = response.data.threadId;
         setThreadId(threadId);
@@ -31,7 +32,7 @@ const AppLayout: React.FC<any> = ({ children }: any) => {
 
   function getThreadsList(navigateFirstChat = false) {
     axios
-      .get("http://localhost:9000/thread/allThreads")
+      .get(`${apiBaseUrl}/thread/allThreads`)
       .then((response) => {
         setThreadIds(response.data);
 
@@ -47,7 +48,7 @@ const AppLayout: React.FC<any> = ({ children }: any) => {
 
   function getMessagesList(threadId: string) {
     axios
-      .get(`http://localhost:9000/thread/${threadId}/messages`)
+      .get(`${apiBaseUrl}/thread/${threadId}/messages`)
       .then((response) => {
         setMessages(response.data.messages);
       })
