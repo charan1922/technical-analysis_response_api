@@ -88,7 +88,7 @@ const Message = ({ role, text }: MessageProps) => {
 const Messages = ({ messages }: any) => {
   return (
     <>
-      {messages.map((msg: any, index: React.Key | null | undefined) => {
+      {(messages || []).map((msg: any, index: React.Key | null | undefined) => {
         return (
           <>
             <Message key={index} role={msg?.role} text={msg?.messageText} />{" "}

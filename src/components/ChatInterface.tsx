@@ -21,10 +21,11 @@ const ChatInterface: React.FC<any> = ({
 
   const { threadId: threadIdFromParams } = useParams();
   const navigate = useNavigate();
+  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
   function getThreadsList(navigateFirstChat = false) {
     axios
-      .get("http://localhost:9000/thread/allThreads")
+      .get(`${apiBaseUrl}/thread/allThreads`)
       .then((response) => {
         setThreadIds(response.data);
 
@@ -40,7 +41,7 @@ const ChatInterface: React.FC<any> = ({
 
   function getMessagesList(threadId: string) {
     axios
-      .get(`http://localhost:9000/thread/${threadId}/messages`)
+      .get(`${apiBaseUrl}/thread/${threadId}/messages`)
       .then((response) => {
         setMessages(response.data.messages);
       })
@@ -94,7 +95,7 @@ const ChatInterface: React.FC<any> = ({
     setLoader(true);
     try {
       const fetchWithoutStream = async () => {
-        const response = await axios.post("http://localhost:9000/message", {
+        const response = await axios.post(`${apiBaseUrl}/message`, {
           message,
           threadId: threadIdFromParams,
         });
@@ -103,7 +104,7 @@ const ChatInterface: React.FC<any> = ({
 
       const fetchStream = async () => {
         try {
-          const response: any = await fetch("http://localhost:9000/message", {
+          const response: any = await fetch(`${apiBaseUrl}/message`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -223,7 +224,9 @@ const ChatInterface: React.FC<any> = ({
         style={{
           backgroundColor: "#FFF",
           padding: "0px 5px",
-          margin:isFileSearch? "25px 50px 25px 50px" : "25px 280px 25px 280px",
+          margin: isFileSearch
+            ? "25px 50px 25px 50px"
+            : "25px 280px 25px 280px",
         }}
       >
         <Flex justify="center" align="center" style={{ marginBottom: 5 }}>
