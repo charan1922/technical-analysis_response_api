@@ -7,7 +7,7 @@ import Messages from "./Messages";
 import loadingGif from "../assets/loading.gif";
 
 const { Content, Footer } = Layout;
-const streaming = true;
+const streaming = false;
 const ChatInterface: React.FC<any> = ({
   isFileSearch = false,
 }: {
@@ -75,6 +75,7 @@ const ChatInterface: React.FC<any> = ({
     });
   };
   const handleSendMessage = async (message: string) => {
+    // if (streaming) {
     const msg: any = [
       {
         messageText: message,
@@ -92,6 +93,7 @@ const ChatInterface: React.FC<any> = ({
       },
     ];
     setMessages([...messages, ...msg]);
+    // }
     setLoader(true);
     try {
       const fetchWithoutStream = async () => {
@@ -100,6 +102,8 @@ const ChatInterface: React.FC<any> = ({
           threadId: threadIdFromParams,
         });
         setMessages(response.data.messages);
+        setInputDisabled(false);
+        setLoader(false);
       };
 
       const fetchStream = async () => {

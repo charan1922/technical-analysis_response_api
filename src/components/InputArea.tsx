@@ -58,17 +58,17 @@ const InputArea: React.FC<InputAreaProps> = ({
           onPressEnter={handleSend}
           placeholder="Message Assistant..."
           style={{ flex: 1, marginRight: "10px", height: 45 }}
-          prefix={
-            <Upload
-              fileList={fileList}
-              onChange={handleUploadChange}
-              beforeUpload={() => false}
-              showUploadList={false}
-            >
-              <Button icon={<CloudUploadOutlined />} type="link" size="large" />
-              <Space />
-            </Upload>
-          }
+          // prefix={
+          //   <Upload
+          //     fileList={fileList}
+          //     onChange={handleUploadChange}
+          //     beforeUpload={() => false}
+          //     showUploadList={false}
+          //   >
+          //     <Button icon={<CloudUploadOutlined />} type="link" size="large" />
+          //     <Space />
+          //   </Upload>
+          // }
         />
         <Button
           style={{ height: 45, width: 60 }}
