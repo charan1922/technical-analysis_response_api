@@ -5,6 +5,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Messages from "./Messages";
 import loadingGif from "../assets/loading.gif";
 import "./ChatInterface/ChatInterface.css";
+import { API_BASE_URL } from "../shared/constants";
 
 const ChatInterface: React.FC<any> = () => {
   const [messages, setMessages] = useState<any>([]);
@@ -12,11 +13,10 @@ const ChatInterface: React.FC<any> = () => {
 
   const { threadId: threadIdFromParams } = useParams();
   const navigate = useNavigate();
-  const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
   function getThreadsList(navigateFirstChat = false) {
     axios
-      .get(`${apiBaseUrl}/thread/allThreads`)
+      .get(`${API_BASE_URL}/thread/allThreads`)
       .then((response) => {
         if (navigateFirstChat) {
           const threadId = response.data?.[0]?.threadId;
@@ -30,7 +30,7 @@ const ChatInterface: React.FC<any> = () => {
 
   function getMessagesList(threadId: string) {
     return axios
-      .get(`${apiBaseUrl}/thread/${threadId}/messages`)
+      .get(`${API_BASE_URL}/thread/${threadId}/messages`)
       .then((response) => {
         setMessages(response.data.messages);
       })
@@ -70,7 +70,7 @@ const ChatInterface: React.FC<any> = () => {
     scrollToBottom(); // Ensure scrolling after user sends a message
 
     try {
-      const response = await axios.post(`${apiBaseUrl}/message`, {
+      const response = await axios.post(`${API_BASE_URL}/message`, {
         message,
         threadId: threadIdFromParams,
       });
@@ -106,10 +106,7 @@ const ChatInterface: React.FC<any> = () => {
 
   const scrollToBottom = () => {
     if (messagesEndRef.current) {
-      console.log("Scrolling to bottom: Element found.");
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
-    } else {
-      console.log("Scrolling to bottom: Element not found.");
     }
   };
 

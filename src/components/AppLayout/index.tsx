@@ -23,7 +23,7 @@ const AppLayout: React.FC<any> = ({ children }: any) => {
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Sidebar threadIds={threadIds} />
+      <Sidebar />
       <Layout className="app-layout">
         <Header className="app-header">
           <div className="app-title">Technical Analysis</div>
