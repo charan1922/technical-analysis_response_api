@@ -56,27 +56,38 @@ const InputArea: React.FC<InputAreaProps> = ({
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           onPressEnter={handleSend}
-          placeholder="Message Assistant..."
-          style={{ flex: 1, marginRight: "10px", height: 45 }}
-          // prefix={
-          //   <Upload
-          //     fileList={fileList}
-          //     onChange={handleUploadChange}
-          //     beforeUpload={() => false}
-          //     showUploadList={false}
-          //   >
-          //     <Button icon={<CloudUploadOutlined />} type="link" size="large" />
-          //     <Space />
-          //   </Upload>
-          // }
+          placeholder="Type your message..."
+          style={{
+            flex: 1,
+            marginRight: "10px",
+            height: 42,
+            borderRadius: "20px",
+            border: "1px solid #d1d1d1",
+            padding: "0 15px",
+            fontSize: "15px",
+            backgroundColor: "#f9f9f9",
+            boxShadow: "0 1px 3px rgba(0, 0, 0, 0.1)",
+          }}
         />
         <Button
-          style={{ height: 45, width: 60 }}
           type="primary"
           icon={<SendOutlined />}
           onClick={handleSend}
-          disabled={inputDisabled}
-        />
+          style={{
+            height: 42,
+            width: 50,
+            borderRadius: "50%",
+            backgroundColor: "#0078d4",
+            border: "none",
+            fontSize: "16px",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2)",
+          }}
+        >
+          <SendOutlined style={{ fontSize: "18px", color: "#fff" }} />
+        </Button>
       </div>
     </>
   );

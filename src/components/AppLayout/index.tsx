@@ -1,98 +1,34 @@
-import React, { useEffect, useRef, useState } from "react";
-import { Avatar, Flex, Layout } from "antd";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { useParams, useNavigate } from "react-router-dom";
-import { UserOutlined } from "@ant-design/icons";
+import { Layout } from "antd";
 import Sidebar from "../Sidebar";
+import "./AppLayout.css";
 
-const { Header } = Layout;
+const { Header, Content } = Layout;
+
 const AppLayout: React.FC<any> = ({ children }: any) => {
-  const [messages, setMessages] = useState<any>([]);
-  const [collapsed, setCollapsed] = useState(false);
-  const [threadId, setThreadId] = useState<string | null>(null);
   const [threadIds, setThreadIds] = useState([]);
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
-  const { threadId: threadIdFromParams } = useParams();
-  const navigate = useNavigate();
-
-  const initiateNewChat = (analysisName: string) => {
-    axios
-      .get(`${apiBaseUrl}/thread/new?name=${analysisName}`)
-      .then((response) => {
-        const threadId = response.data.threadId;
-        setThreadId(threadId);
-        const navigateFirstChat = true;
-        getThreadsList(navigateFirstChat);
-      })
-      .catch((error) => {
-        console.error("There was an error fetching the thread data:", error);
-      });
-  };
-
-  function getThreadsList(navigateFirstChat = false) {
+  useEffect(() => {
     axios
       .get(`${apiBaseUrl}/thread/allThreads`)
       .then((response) => {
         setThreadIds(response.data);
-
-        if (navigateFirstChat) {
-          const threadId = response.data?.[0]?.threadId;
-          navigate(`/c/${threadId}`);
-        }
       })
       .catch((error) => {
-        console.error("There was an error fetching the thread data:", error);
+        console.error("Error fetching threads:", error);
       });
-  }
-
-  function getMessagesList(threadId: string) {
-    axios
-      .get(`${apiBaseUrl}/thread/${threadId}/messages`)
-      .then((response) => {
-        setMessages(response.data.messages);
-      })
-      .catch((error) => {
-        console.error("There was an error fetching the thread data:", error);
-      });
-  }
-
-  useEffect(() => {
-    getThreadsList();
   }, []);
-
-  useEffect(() => {
-    if (threadIdFromParams) {
-      getMessagesList(threadIdFromParams);
-    }
-  }, [threadIdFromParams]);
 
   return (
     <Layout style={{ height: "100vh" }}>
-      <Sidebar
-        collapsed={collapsed}
-        onCollapse={setCollapsed}
-        threadIds={threadIds}
-        initiateNewChat={initiateNewChat}
-      />
-      <Layout style={{ backgroundColor: "#FFF" }}>
-        <Header style={{ display: "flex", justifyContent: "space-between" }}>
-          <Flex
-            align="center"
-            style={{ color: "#FFF", fontSize: 20, fontWeight: 400 }}
-          >
-            Algorum Mystic
-          </Flex>
-          <Flex align="center">
-            <Avatar
-              style={{
-                color: "#FFF",
-              }}
-              icon={<UserOutlined />}
-            />
-          </Flex>
+      <Sidebar threadIds={threadIds} />
+      <Layout className="app-layout">
+        <Header className="app-header">
+          <div className="app-title">Technical Analysis</div>
         </Header>
-        {children}
+        <Content className="app-content">{children}</Content>
       </Layout>
     </Layout>
   );

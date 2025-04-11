@@ -1,111 +1,39 @@
-import { Button, Layout, Menu, MenuProps } from "antd";
-import {
-  MessageOutlined,
-  SettingOutlined,
-  PlusOutlined,
-  LogoutOutlined,
-  FileOutlined,
-} from "@ant-design/icons";
-import { useEffect, useState } from "react";
-import { Link, useLocation, useParams } from "react-router-dom";
+import { useState } from "react";
+import { Button, Layout, Menu } from "antd";
+import { PlusOutlined } from "@ant-design/icons";
+import { Link } from "react-router-dom";
+import "./Sidebar.css";
 import AnalysisModal from "./AnalysisModal";
 
 const { Sider } = Layout;
 
-interface ISidebar {
-  collapsed: boolean;
-  onCollapse: React.Dispatch<React.SetStateAction<boolean>>;
-  threadIds: any;
-  initiateNewChat: any;
-}
-
-type MenuItem = Required<MenuProps>["items"][number];
-
-const Sidebar = ({
-  collapsed,
-  onCollapse,
-  threadIds,
-  initiateNewChat,
-}: ISidebar) => {
-  const { threadId } = useParams();
+const Sidebar = ({ threadIds, initiateNewChat }: any) => {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const [current, setCurrent] = useState(threadId || "");
-
-  const onClick: MenuProps["onClick"] = (e) => {
-    setCurrent(e.key);
-  };
 
   const handleSubmit = (analysisName: string) => {
     initiateNewChat(analysisName);
   };
 
-  useEffect(() => {
-    if (threadId) setCurrent(threadId);
-  }, [threadId]);
-
-  const items: MenuItem[] = [
-    // {
-    //   label: <span onClick={() => setIsModalVisible(true)}>New Analysis</span>,
-    //   key: "newAnalysis",
-    //   icon: <PlusOutlined />,
-    // },
-    ...(threadIds || []).map(
-      ({
-        threadId,
-        analysisName,
-      }: {
-        threadId: string;
-        analysisName: string;
-      }) => ({
-        label: <Link to={`/c/${threadId}`}>{analysisName}</Link>,
-        key: threadId,
-        icon: <MessageOutlined />,
-      })
-    ),
-  ];
-
   return (
     <>
-      <Sider
-        width={250}
-        collapsible
-        collapsed={collapsed}
-        onCollapse={onCollapse}
-      >
-        <>
+      <Sider width={300} className="sidebar">
+        <div className="sidebar-header">
           <Button
-            type="text"
+            type="primary"
+            icon={<PlusOutlined />}
             onClick={() => setIsModalVisible(true)}
-            style={{ margin: 16, color: "#FFF", fontSize: 14 }}
+            className="new-chat-button"
           >
-            <PlusOutlined />
-            {collapsed ? "" : "New Analysis"}
+            New Chat
           </Button>
-          <Menu
-            theme="dark"
-            mode="inline"
-            onClick={onClick}
-            items={items}
-            selectedKeys={[current]}
-          />
-
-          <div style={{ marginTop: "auto" }}>
-            <Button
-              type="link"
-              href={`/file-search/${"thread_HpsiXNWknaz9HjEpm49JbYaE"}`}
-              style={{
-                margin: 16,
-                color: "#FFF",
-                fontSize: 14,
-                bottom: 50,
-                position: "absolute",
-              }}
-            >
-              <FileOutlined />
-              File Search
-            </Button>
-          </div>
-        </>
+        </div>
+        <Menu theme="dark" mode="inline" className="conversation-list">
+          {(threadIds || []).map(({ threadId, analysisName }: any) => (
+            <Menu.Item key={threadId}>
+              <Link to={`/c/${threadId}`}>{analysisName}</Link>
+            </Menu.Item>
+          ))}
+        </Menu>
       </Sider>
       <AnalysisModal
         isModalVisible={isModalVisible}

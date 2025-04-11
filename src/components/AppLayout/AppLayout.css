@@ -1,0 +1,28 @@
+/* AppLayout.css */
+.app-layout {
+  background-color: #f7f7f8;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Updated Header section color to match Sidebar */
+.app-header {
+  background-color: #202123; /* Same as Sidebar background color */
+  color: white;
+  padding: 0 20px;
+  display: flex;
+  align-items: center;
+  height: 60px;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.app-title {
+  margin: 0;
+  font-size: 20px; /* Optional: Adjust font size for better visibility */
+}
+
+.app-content {
+  padding: 20px;
+  overflow-y: auto;
+}

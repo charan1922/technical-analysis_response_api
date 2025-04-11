@@ -1,0 +1,50 @@
+/* Messages.css */
+.messages {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 20px;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.message {
+  display: flex;
+  align-items: flex-start;
+  font-family: 'Roboto', sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.message.user {
+  justify-content: flex-end;
+}
+
+.message.assistant {
+  justify-content: flex-start;
+  font-style: italic; /* Optional: Add a distinct style */
+}
+
+.message-bubble {
+  max-width: 70%;
+  padding: 12px 18px;
+  border-radius: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.message.user .message-bubble {
+  background-color: #0078d4;
+  color: white;
+  border-bottom-right-radius: 0;
+}
+
+.message.assistant .message-bubble {
+  background-color: #d1e7dd; /* Light green for a friendly tone */
+  color: #0f5132; /* Dark green for text */
+  border-bottom-left-radius: 0;
+  border: 1px solid #badbcc; /* Subtle border for better visibility */
+  padding: 15px 20px; /* Adjust padding for better spacing */
+  font-family: 'Arial', sans-serif; /* Optional: Change font */
+}

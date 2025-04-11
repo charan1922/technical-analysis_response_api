@@ -1,0 +1,31 @@
+/* Sidebar.css */
+.sidebar {
+  background-color: #202123;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.sidebar-header {
+  padding: 20px;
+  border-bottom: 1px solid #3c3f41;
+}
+
+.new-chat-button {
+  width: 100%;
+  background-color: #10a37f;
+  border: none;
+  color: white;
+  font-weight: bold;
+}
+
+.conversation-list {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.conversation-list .ant-menu-item {
+  padding: 10px 20px;
+  font-size: 14px;
+}
