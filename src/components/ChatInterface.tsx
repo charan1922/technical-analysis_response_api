@@ -14,20 +14,6 @@ const ChatInterface: React.FC<any> = () => {
   const { sessionId: sessionIdFromParams } = useParams();
   const navigate = useNavigate();
 
-  function getThreadsList(navigateFirstChat = false) {
-    axios
-      .get(`${API_BASE_URL}/thread/allThreads`)
-      .then((response) => {
-        if (navigateFirstChat) {
-          const threadId = response.data?.[0]?.threadId;
-          navigate(`/c/${threadId}`);
-        }
-      })
-      .catch((error) => {
-        console.error("There was an error fetching the thread data:", error);
-      });
-  }
-
   function getMessagesList(sessionId: string) {
     return axios
       .get(`${API_BASE_URL}/response/${sessionId}`)
@@ -89,16 +75,6 @@ const ChatInterface: React.FC<any> = () => {
       setInputDisabled(false);
     }
   };
-
-  /*
-  =======================
-  === Stream Handling End ===
-  =======================
-*/
-
-  useEffect(() => {
-    getThreadsList();
-  }, []);
 
   useEffect(() => {
     if (sessionIdFromParams) {
