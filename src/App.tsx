@@ -15,7 +15,7 @@ const App: React.FC = () => {
       ),
       children: [
         {
-          path: "c/:threadId",
+          path: "c/:sessionId",
           element: (
             <AppLayout>
               <ChatInterface />

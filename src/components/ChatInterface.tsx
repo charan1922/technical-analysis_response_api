@@ -11,7 +11,7 @@ const ChatInterface: React.FC<any> = () => {
   const [messages, setMessages] = useState<any>([]);
   const [inputDisabled, setInputDisabled] = useState(false);
 
-  const { threadId: threadIdFromParams } = useParams();
+  const { sessionId: sessionIdFromParams } = useParams();
   const navigate = useNavigate();
 
   function getThreadsList(navigateFirstChat = false) {
@@ -28,9 +28,9 @@ const ChatInterface: React.FC<any> = () => {
       });
   }
 
-  function getMessagesList(threadId: string) {
+  function getMessagesList(sessionId: string) {
     return axios
-      .get(`${API_BASE_URL}/thread/${threadId}/messages`)
+      .get(`${API_BASE_URL}/response/${sessionId}`)
       .then((response) => {
         setMessages(response.data.messages);
       })
@@ -56,25 +56,31 @@ const ChatInterface: React.FC<any> = () => {
         msgId: "",
         role: "user",
         runId: null,
-        thread_id: threadIdFromParams,
+        thread_id: sessionIdFromParams,
       },
       {
         messageText: `![Loading...](${loadingGif})`,
         msgId: "",
+        loader: true,
         role: "assistant",
         runId: null,
-        thread_id: threadIdFromParams,
+        thread_id: sessionIdFromParams,
       },
     ];
     setMessages([...messages, ...msg]);
     scrollToBottom(); // Ensure scrolling after user sends a message
 
     try {
-      const response = await axios.post(`${API_BASE_URL}/message`, {
+      const response = await axios.post(`${API_BASE_URL}/response`, {
         message,
-        threadId: threadIdFromParams,
+        session_id: sessionIdFromParams,
       });
-      setMessages(response.data.messages);
+      debugger;
+
+      setMessages((prevMessages: any) => {
+        const msgs = prevMessages.filter((item: any) => !item.loader);
+        return [...msgs, ...(response.data.messages || [])];
+      });
       scrollToBottom(); // Ensure scrolling after assistant's response
       setInputDisabled(false);
     } catch (error) {
@@ -95,12 +101,12 @@ const ChatInterface: React.FC<any> = () => {
   }, []);
 
   useEffect(() => {
-    if (threadIdFromParams) {
-      getMessagesList(threadIdFromParams).then(() => {
+    if (sessionIdFromParams) {
+      getMessagesList(sessionIdFromParams).then(() => {
         scrollToBottom(); // Ensure scrolling after messages are loaded
       });
     }
-  }, [threadIdFromParams]);
+  }, [sessionIdFromParams]);
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 

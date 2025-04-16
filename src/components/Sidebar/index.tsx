@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Button, Layout, Menu, message, Tooltip } from "antd";
 import axios from "axios";
 import { PlusOutlined, DeleteOutlined } from "@ant-design/icons";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "./Sidebar.css";
 import AnalysisModal from "./AnalysisModal";
 import { API_BASE_URL } from "../../shared/constants";
@@ -13,6 +13,7 @@ const Sidebar = ({}: any) => {
   const [sessionIds, setSessionIds] = useState<
     { sessionId: string; analysisName: string }[]
   >([]);
+  const navigate = useNavigate();
 
   const getSessions = async () => {
     axios
@@ -72,21 +73,25 @@ const Sidebar = ({}: any) => {
               }}
             >
               <span
+                onClick={() => {
+                  navigate(`/c/${sessionId}`); // Use React Router's navigate function
+                }}
                 style={{
                   flex: 1,
                   overflow: "hidden",
                   textOverflow: "ellipsis",
                   whiteSpace: "nowrap",
                   marginRight: "20px",
+                  cursor: "pointer", // Indicate it's clickable
                 }}
               >
                 {analysisName}
               </span>
-              <Tooltip title="Delete">
+              <Tooltip title="Delete Session">
                 <span
-                  style={{ cursor: "pointer", color: "#d32f2f" }} // Updated color to a different red shade
+                  style={{ cursor: "pointer", color: "#d32f2f" }}
                   onClick={(e) => {
-                    e.stopPropagation(); // Prevent triggering the Link
+                    e.stopPropagation(); // Prevent triggering the navigation
                     handleDeleteSession(sessionId);
                   }}
                 >
